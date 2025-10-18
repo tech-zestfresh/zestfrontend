@@ -11,7 +11,7 @@ const nav=useNavigation()
 
 useEffect(()=>{
   setTimeout(()=>{
-     nav.replace('Homescreen')
+     nav.replace('Enternumber')
 
   },2000);
 },[]);

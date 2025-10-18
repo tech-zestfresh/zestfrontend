@@ -7,7 +7,7 @@ import Splash from "./src/Screens/Splash";
 import Emaillogin from "./src/Screens/Emaillogin";
 import Emailsignup from './src/Screens/Emailsignup';
 import Enternumber from './src/Screens/Enternumber';
-import Emailotp from './src/Screens/Enterotp';
+import Enterotp from './src/Screens/Enterotp';
 import Homescreen from "./src/Screens/Homescreen";
 
 
@@ -21,7 +21,7 @@ function RootStack() {
   return (
     <Stack.Navigator   screenOptions={{headerShown:false}} initialRouteName='Splash' >
       <Stack.Screen name="Splash" component={Splash} />
-      <Stack.Screen name="Emailotp" component={Emailotp} />
+      <Stack.Screen name="Enterotp" component={Enterotp} />
       <Stack.Screen name="Enternumber" component={Enternumber} />
       <Stack.Screen name="Emaillogin" component={Emaillogin} />
       <Stack.Screen name="Emailsignup" component={Emailsignup} />

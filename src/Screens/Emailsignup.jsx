@@ -7,8 +7,12 @@ import {
   StyleSheet,
   Alert,
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+
 
 const SignupScreen = () => {
+  const navigation = useNavigation();
+
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -78,7 +82,7 @@ const SignupScreen = () => {
       <View style={styles.signinContainer}>
         <Text style={styles.signinText}>Already have an account? </Text>
         <TouchableOpacity>
-          <Text style={styles.signinLink}>Sign in</Text>
+          <Text style={styles.signinLink}   onPress={()=>navigation.navigate('Emaillogin')}     >Sign in</Text>
         </TouchableOpacity>
       </View>
     </View>
