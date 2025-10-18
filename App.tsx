@@ -4,8 +4,11 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Splash from "./src/Screens/Splash";
-import Login from "./src/Screens/Login";
-import Signup from './src/Screens/Signup';
+import Emaillogin from "./src/Screens/Emaillogin";
+import Emailsignup from './src/Screens/Emailsignup';
+import Enternumber from './src/Screens/Enternumber';
+import Emailotp from './src/Screens/Enterotp';
+import Homescreen from "./src/Screens/Homescreen";
 
 
 
@@ -18,8 +21,12 @@ function RootStack() {
   return (
     <Stack.Navigator   screenOptions={{headerShown:false}} initialRouteName='Splash' >
       <Stack.Screen name="Splash" component={Splash} />
-      <Stack.Screen name="Login" component={Login} />
-      <Stack.Screen name="Signup" component={Signup} />
+      <Stack.Screen name="Emailotp" component={Emailotp} />
+      <Stack.Screen name="Enternumber" component={Enternumber} />
+      <Stack.Screen name="Emaillogin" component={Emaillogin} />
+      <Stack.Screen name="Emailsignup" component={Emailsignup} />
+      <Stack.Screen name="Homescreen" component={Homescreen} />
+      
     </Stack.Navigator>
   );
 }

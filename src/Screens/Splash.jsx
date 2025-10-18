@@ -11,7 +11,7 @@ const nav=useNavigation()
 
 useEffect(()=>{
   setTimeout(()=>{
-     nav.replace('Signup')
+     nav.replace('Homescreen')
 
   },2000);
 },[]);
