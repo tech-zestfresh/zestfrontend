@@ -9,6 +9,7 @@ import Emailsignup from './src/Screens/Emailsignup';
 import Enternumber from './src/Screens/Enternumber';
 import Enterotp from './src/Screens/Enterotp';
 import Homescreen from "./src/Screens/Homescreen";
+import LocationPopup from "./src/Screens/LocationPopup";
 
 
 
@@ -20,6 +21,7 @@ const Stack = createNativeStackNavigator();
 function RootStack() {
   return (
     <Stack.Navigator   screenOptions={{headerShown:false}} initialRouteName='Splash' >
+      <Stack.Screen name="LocationPopup" component={LocationPopup} />
       <Stack.Screen name="Splash" component={Splash} />
       <Stack.Screen name="Enterotp" component={Enterotp} />
       <Stack.Screen name="Enternumber" component={Enternumber} />

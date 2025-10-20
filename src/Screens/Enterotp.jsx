@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -6,47 +6,94 @@ import {
   TouchableOpacity,
   StyleSheet,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const OTPVerificationScreen = ({ navigation }) => {
-  const [otp, setOtp] = useState(['', '', '', '']);
+const OTPVerificationScreen = ({ navigation, route }) => {
+  const mobile = route.params?.mobile;
+  const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const inputs = useRef([]);
 
-  const handleChange = (text, index) => {
-    if (/^\d$/.test(text)) {
-      const newOtp = [...otp];
-      newOtp[index] = text;
-      setOtp(newOtp);
+  const [timer, setTimer] = useState(30);
+  const [canResend, setCanResend] = useState(false);
+  const [verifying, setVerifying] = useState(false);
 
-      // Move to next input
-      if (index < 3) {
-        inputs.current[index + 1].focus();
-      }
-    } else if (text === '') {
-      const newOtp = [...otp];
+  useEffect(() => {
+    if (timer > 0) {
+      const interval = setInterval(() => {
+        setTimer(prev => prev - 1);
+      }, 1000);
+      return () => clearInterval(interval);
+    } else {
+      setCanResend(true);
+    }
+  }, [timer]);
+
+  const handleChange = (text, index) => {
+    const newOtp = [...otp];
+
+    if (text === '') {
       newOtp[index] = '';
       setOtp(newOtp);
+      if (index > 0) {
+        inputs.current[index - 1].focus();
+      }
+    } else if (/^\d$/.test(text)) {
+      newOtp[index] = text;
+      setOtp(newOtp);
+      if (index < 5) {
+        inputs.current[index + 1].focus();
+      } else {
+        verifyOTP(newOtp.join('')); // ✅ Auto-submit
+      }
     }
   };
 
-  const handleSubmit = () => {
-    const code = otp.join('');
-    if (code.length === 4) {
-      console.log('Entered OTP:', code);
-      // Send to backend for verification
-    } else {
-      Alert.alert('Invalid Code', 'Please enter all 4 digits');
+  const verifyOTP = async (code) => {
+    setVerifying(true);
+    try {
+      const response = await axios.post('http://192.168.0.104:8080/auth/otp/verify', {
+        identifier: mobile,
+        otp: code,
+      });
+
+      console.log(response.data);
+      if (response.data.message === 'OTP verified successfully') {
+        const now = new Date().toISOString();
+        await AsyncStorage.setItem('userLogin', JSON.stringify({ phone: `+91${mobile}`, timestamp: now }));
+        navigation.navigate('Home');
+      } else {
+        Alert.alert('Verification Failed', 'Invalid OTP');
+      }
+    } catch (error) {
+      console.error('Error verifying OTP:', error);
+      Alert.alert('Error', 'Something went wrong');
+    } finally {
+      setVerifying(false);
     }
   };
 
   const handleResend = () => {
+    if (!canResend) return;
+
     console.log('Resend OTP triggered');
-    // Call backend to resend OTP
+    setTimer(30);
+    setCanResend(false);
+
+    axios.post('http://192.168.0.104:8080/auth/otp/resend', {
+      identifier: mobile,
+    }).then(res => {
+      console.log('Resend response:', res.data);
+    }).catch(err => {
+      console.error('Resend error:', err);
+    });
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Enter your 4-digit code</Text>
+      <Text style={styles.title}>Enter your 6-digit code</Text>
       <Text style={styles.label}>Code</Text>
 
       <View style={styles.otpContainer}>
@@ -59,25 +106,30 @@ const OTPVerificationScreen = ({ navigation }) => {
             maxLength={1}
             value={digit}
             onChangeText={(text) => handleChange(text, index)}
+            editable={!verifying}
           />
         ))}
       </View>
 
-      <TouchableOpacity onPress={handleResend}>
-        <Text style={styles.resend}>Resend Code</Text>
+      <TouchableOpacity onPress={handleResend} disabled={!canResend}>
+        <Text style={[styles.resend, { color: canResend ? 'green' : 'gray' }]}>
+          {canResend ? 'Resend Code' : `Resend in ${timer}s`}
+        </Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
-        <Text style={styles.arrow}>→</Text>
+      <TouchableOpacity style={styles.submitButton} onPress={() => verifyOTP(otp.join(''))} disabled={verifying}>
+        {verifying ? (
+          <ActivityIndicator color="#fff" />
+        ) : (
+          <Text style={styles.arrow}>→</Text>
+        )}
       </TouchableOpacity>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, justifyContent: 'top',  marginTop:50
-    
-  },
+  container: { flex: 1, padding: 20, marginTop: 50 },
   title: { fontSize: 22, fontWeight: 'bold', marginBottom: 10 },
   label: { fontSize: 16, color: '#666', marginBottom: 10 },
   otpContainer: {
@@ -94,7 +146,6 @@ const styles = StyleSheet.create({
     color: '#000',
   },
   resend: {
-    color: 'green',
     fontSize: 16,
     marginBottom: 30,
   },

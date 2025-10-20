@@ -16,6 +16,17 @@ useEffect(()=>{
   },2000);
 },[]);
 
+useEffect(() => {
+  const checkLogin = async () => {
+    const session = await loadSession();
+    if (session) {
+      nav.replace('Home'); // or your logged-in screen
+    } else {
+      nav.replace('Login'); // or phone entry screen
+    }
+  };
+  checkLogin();
+}, []);
 
 
 
