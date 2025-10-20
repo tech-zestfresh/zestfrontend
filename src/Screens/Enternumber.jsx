@@ -21,7 +21,7 @@ const Enternumber = () => {
     }
 
     try {
-      const response = await axios.post('http://192.168.0.106:8080/auth/otp/send', {
+      const response = await axios.post('http://192.168.0.104:8080/auth/otp/send', {
         "mobileNumber": mobile,
         "countryCode": "+91"
       });

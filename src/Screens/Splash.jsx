@@ -9,12 +9,12 @@ const Splash = () => {
 const nav=useNavigation()
 
 
-useEffect(()=>{
-  setTimeout(()=>{
-     nav.replace('Enternumber')
+// useEffect(()=>{
+//   setTimeout(()=>{
+//      nav.replace('Enternumber')
 
-  },2000);
-},[]);
+//   },2000);
+// },[]);
 
 useEffect(() => {
   const checkLogin = async () => {

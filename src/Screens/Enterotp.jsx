@@ -56,16 +56,16 @@ const OTPVerificationScreen = ({ navigation, route }) => {
     setVerifying(true);
     try {
       console.log(mobile, code);
-      const response = await axios.post('http://192.168.0.106:8080/auth/otp/verify', {
+      const response = await axios.post('http://192.168.0.104:8080/auth/otp/verify', {
          "mobileNumber": mobile,
         "otp": code
       });
 
       console.log(response.data);
-      if (response.data.message === 'OTP verified successfully') {
+      if (response.data.accessToken) {
         const now = new Date().toISOString();
-        await AsyncStorage.setItem('userLogin', JSON.stringify({ phone: `+91${mobile}`, timestamp: now }));
-        navigation.navigate('Home');
+        await AsyncStorage.setItem('userSession', JSON.stringify({ phone: `+91${mobile}`, timestamp: now }));
+        navigation.navigate('Homescreen');
       } else {
         Alert.alert('Verification Failed', 'Invalid OTP');
       }
