@@ -21,16 +21,16 @@ const Enternumber = () => {
     }
 
     try {
-      const response = await axios.post('http://192.168.0.104:8080/auth/otp/send', {
-"mobileNumber" : mobile,
-"countryCode" : "+91" 
+      const response = await axios.post('http://192.168.0.106:8080/auth/otp/send', {
+        "mobileNumber": mobile,
+        "countryCode": "+91"
       });
-       console.log(response.data);
+      console.log(response.data);
       if (response.data.message === "OTP sent successfully") {
         const now = new Date().toISOString();
         await AsyncStorage.setItem('userLogin', JSON.stringify({ phone: `+91${mobile}`, timestamp: now }));
 
-        navigation.navigate('Enterotp', { phone: `+91${mobile}` });
+        navigation.navigate('Enterotp', { phone: mobile });
       } else {
         alert("Failed to send OTP");
       }

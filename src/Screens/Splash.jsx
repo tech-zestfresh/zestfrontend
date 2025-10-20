@@ -2,7 +2,7 @@ import { View, Text, TurboModuleRegistry, StatusBar, Image } from 'react-native'
 import React, { useEffect } from 'react'
 import {myColors} from "./../Utils/Mycolors";
 import { useNavigation } from '@react-navigation/native';
-
+import { loadSession } from '../Utils/Gettokenapi';
 
 const Splash = () => {
 
@@ -20,9 +20,9 @@ useEffect(() => {
   const checkLogin = async () => {
     const session = await loadSession();
     if (session) {
-      nav.replace('Home'); // or your logged-in screen
+      nav.replace('Homescreen'); // or your logged-in screen
     } else {
-      nav.replace('Login'); // or phone entry screen
+      nav.replace('Enternumber'); // or phone entry screen
     }
   };
   checkLogin();
