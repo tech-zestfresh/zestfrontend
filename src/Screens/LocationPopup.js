@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -10,21 +10,54 @@ import {
   Platform,
   Alert,
   ActivityIndicator,
+  AppState,
 } from 'react-native';
 import Geolocation from '@react-native-community/geolocation';
 import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const LOCATION_KEY = 'cached_location';
+const CITY_KEY = 'cached_city';
+const TIMESTAMP_KEY = 'cached_location_timestamp';
 
 const LocationPopup = () => {
   const [visible, setVisible] = useState(true);
   const [location, setLocation] = useState(null);
   const [city, setCity] = useState(null);
+  const [lastUpdated, setLastUpdated] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [appState, setAppState] = useState(AppState.currentState);
+
+  useEffect(() => {
+    const loadCachedLocation = async () => {
+      try {
+        const loc = await AsyncStorage.getItem(LOCATION_KEY);
+        const cityName = await AsyncStorage.getItem(CITY_KEY);
+        const timestamp = await AsyncStorage.getItem(TIMESTAMP_KEY);
+        if (loc) setLocation(JSON.parse(loc));
+        if (cityName) setCity(cityName);
+        if (timestamp) setLastUpdated(new Date(parseInt(timestamp)));
+      } catch (err) {
+        console.log('Failed to load cached location:', err);
+      }
+    };
+    loadCachedLocation();
+  }, []);
+
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', nextAppState => {
+      if (appState.match(/inactive|background/) && nextAppState === 'active') {
+        handleShareLocation(); // Auto-refresh
+      }
+      setAppState(nextAppState);
+    });
+    return () => subscription.remove();
+  }, [appState]);
 
   const requestLocationPermission = async () => {
     if (Platform.OS === 'android') {
       const granted = await PermissionsAndroid.request(
         PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-        
         {
           title: 'Location Access',
           message: 'We need your location to help you find our best available products.',
@@ -42,19 +75,14 @@ const LocationPopup = () => {
   const reverseGeocode = async (latitude, longitude) => {
     try {
       const url = `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`;
-
-      console.log(url);
       const response = await axios.get(url, {
         headers: { 'User-Agent': 'zestfrontend-app' },
       });
       const address = response.data.address;
       const cityName =
-        address.city ||
-        address.town ||
-        address.village ||
-        address.suburb ||
-        'Unknown location';
+        address.city || address.town || address.village || address.suburb || 'Unknown location';
       setCity(cityName);
+      await AsyncStorage.setItem(CITY_KEY, cityName);
     } catch (error) {
       console.log('Reverse geocoding error:', error);
       Alert.alert('Error', 'Could not get city name');
@@ -63,16 +91,21 @@ const LocationPopup = () => {
 
   const handleShareLocation = async () => {
     const hasPermission = await requestLocationPermission();
-    console.log(hasPermission);
     if (!hasPermission) return;
 
     setLoading(true);
     Geolocation.getCurrentPosition(
       async position => {
-         console.log("inside getcurrentPosition")
         const { latitude, longitude } = position.coords;
-        console.log(position.coords);
-        setLocation({ latitude, longitude });
+        const locObj = { latitude, longitude };
+        const timestamp = Date.now();
+
+        setLocation(locObj);
+        setLastUpdated(new Date(timestamp));
+
+        await AsyncStorage.setItem(LOCATION_KEY, JSON.stringify(locObj));
+        await AsyncStorage.setItem(TIMESTAMP_KEY, timestamp.toString());
+
         await reverseGeocode(latitude, longitude);
         setLoading(false);
         setVisible(false);
@@ -122,6 +155,17 @@ const LocationPopup = () => {
               ? `You are in ${city}`
               : `Lat: ${location.latitude.toFixed(4)}, Lon: ${location.longitude.toFixed(4)}`}
           </Text>
+          {lastUpdated && (
+            <Text style={styles.timestamp}>
+              Last updated: {lastUpdated.toLocaleString()}
+            </Text>
+          )}
+          <TouchableOpacity
+            style={[styles.button, { backgroundColor: '#555', marginTop: 12 }]}
+            onPress={handleShareLocation}
+          >
+            <Text style={styles.buttonText}>Refresh Location</Text>
+          </TouchableOpacity>
         </View>
       )}
     </>
@@ -185,6 +229,11 @@ const styles = StyleSheet.create({
   locText: {
     fontSize: 16,
     fontWeight: '500',
+  },
+  timestamp: {
+    fontSize: 12,
+    color: '#666',
+    marginTop: 4,
   },
 });
 

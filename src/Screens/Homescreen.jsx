@@ -1,67 +1,174 @@
-import React from 'react';
+import React from "react";
 import {
   View,
   Text,
-  ScrollView,
+  TextInput,
   Image,
-  StyleSheet,
   TouchableOpacity,
-} from 'react-native';
+  FlatList,
+  
+  Dimensions,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import Ionicons from "react-native-vector-icons/Ionicons";
+import locationText from "./locationtext";
+const { width } = Dimensions.get("window");
+const isTablet = width >= 768; // Responsive check
 
-const HomeScreen = () => {
+const categories = [
+  { title: "Fresh Fruits & Vegetable", image: require("../assets/zestfresh.png"), bg: "#E6F9EE" },
+  { title: "Cooking Oil & Ghee", image: require("../assets/zestfresh.png"), bg: "#FFF4E5" },
+  { title: "Meat & Fish", image: require("../assets/zestfresh.png"), bg: "#FFE9E9" },
+  { title: "Bakery & Snacks", image: require("../assets/zestfresh.png"), bg: "#FFF1F8" },
+  { title: "Dairy & Eggs", image: require("../assets/zestfresh.png"), bg: "#FFFBEA" },
+  { title: "Beverages", image: require("../assets/zestfresh.png"), bg: "#E9F6FF" },
+];
+
+const ExploreScreen = () => {
+  const renderCategory = ({ item }) => (
+    <TouchableOpacity
+      style={{
+        width: isTablet ? "30%" : "48%",
+        backgroundColor: item.bg,
+        borderRadius: 16,
+        padding: isTablet ? 25 : 15,
+        marginBottom: 30,
+        alignItems: "center",
+        margin: isTablet ? "1.5%" : "1%",
+        
+      }}
+    >
+      <Image
+        source={item.image}
+        style={{
+          width: isTablet ? 120 : 80,
+          height: isTablet ? 120 : 80,
+          resizeMode: "contain",
+        }}
+      />
+      <Text
+        style={{
+          marginTop: 10,
+          textAlign: "center",
+          fontWeight: "600",
+          color: "#333",
+          fontSize: isTablet ? 18 : 14,
+        }}
+      >
+        {item.title}
+      </Text>
+    </TouchableOpacity>
+  );
+
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.location}>Dhaka, Banassre</Text>
-      <Text style={styles.sectionTitle}>Fresh Vegetables</Text>
-      <Text style={styles.offer}>Get Up To 40% OFF</Text>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
+      {/* Header */}
+      
+      <View style={{ paddingTop: 10, paddingBottom: 10, backgroundColor: "#fff" }}>
+  <View style={{ flexDirection: "row", justifyContent:"center", alignItems: "center"
+  }}>
+    <Text style={{ fontSize: isTablet ? 16 : 14, color: "#555", marginRight: 5 }}>
+      📍 {locationText}
+    </Text>
+    <Text
+      style={{
+        fontSize: isTablet ? 28 : 22,
+        fontWeight: "600",
+        textAlign: "left",
+      }}
+    >
+      Find Products
+    </Text>
+  </View>
 
-      <View style={styles.productRow}>
-        <ProductCard name="Organic Bananas" price="$4.99" weight="1kg" />
-        <ProductCard name="Red Apple" price="$4.99" weight="1kg" />
+
+        {/* Search Bar */}
+        <View
+          style={{
+            flexDirection: "row",
+            backgroundColor: "#F2F2F2",
+            marginHorizontal: 20,
+            borderRadius: 12,
+            alignItems: "center",
+            paddingHorizontal: 10,
+            height: isTablet ? 55 : 45,
+          }}
+        >
+          <Ionicons name="search" size={20} color="#777" />
+          <TextInput
+            placeholder="Search Store"
+            style={{
+              flex: 1,
+              marginLeft: 8,
+              fontSize: isTablet ? 18 : 16,
+            }}
+          />
+        </View>
       </View>
 
-      <Text style={styles.sectionTitle}>Best Selling</Text>
-      <View style={styles.productRow}>
-        <ProductCard name="Bell Pepper Red" price="$4.99" weight="1kg" />
-        <ProductCard name="Ginger" price="$4.99" weight="250gm" />
-      </View>
+      {/* Category Grid */}
+      <FlatList
+        data={categories}
+        keyExtractor={(item) => item.title}
+        renderItem={renderCategory}
+        numColumns={isTablet ? 3 : 2}
+        contentContainerStyle={{
+          paddingHorizontal: 20,
+          paddingVertical: 20,
+          paddingBottom: 100, // space for bottom nav
+        }}
+        showsVerticalScrollIndicator={false}
+      />
 
-      <Text style={styles.sectionTitle}>Groceries</Text>
-      <View style={styles.productRow}>
-        <ProductCard name="Pulses" price="$4.99" weight="1kg" />
-        <ProductCard name="Rice" price="$4.99" weight="1kg" />
+      {/* Sticky Bottom Navigation */}
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "space-around",
+          alignItems: "center",
+          borderTopWidth: 1,
+          borderColor: "#eee",
+          paddingVertical: 10,
+          backgroundColor: "#fff",
+          position: "absolute",
+          bottom: 0,
+          left: 0,
+          right: 0,
+          height: isTablet ? 70 : 60,
+          elevation: 10,
+          shadowColor: "#000",
+          shadowOpacity: 0.1,
+          shadowOffset: { width: 0, height: -2 },
+        }}
+      >
+        <TouchableOpacity style={{ alignItems: "center" }}>
+          <Ionicons name="home-outline" size={isTablet ? 26 : 22} color="#777" />
+          <Text style={{ fontSize: isTablet ? 14 : 12 }}>Shop</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={{ alignItems: "center" }}>
+          <Ionicons name="compass" size={isTablet ? 26 : 22} color="#00A86B" />
+          <Text style={{ fontSize: isTablet ? 14 : 12, color: "#00A86B" }}>Explore</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={{ alignItems: "center" }}>
+          <Ionicons name="cart-outline" size={isTablet ? 26 : 22} color="#777" />
+          <Text style={{ fontSize: isTablet ? 14 : 12 }}>Cart</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={{ alignItems: "center" }}>
+          <Ionicons name="heart-outline" size={isTablet ? 26 : 22} color="#777" />
+          <Text style={{ fontSize: isTablet ? 14 : 12 }}>Favourite</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={{ alignItems: "center" }}>
+          <Ionicons name="person-outline" size={isTablet ? 26 : 22} color="#777" />
+          <Text style={{ fontSize: isTablet ? 14 : 12 }}>Account</Text>
+        </TouchableOpacity>
       </View>
-    </ScrollView>
+    </SafeAreaView>
   );
 };
 
-const ProductCard = ({ name, price, weight }) => (
-  <View style={styles.card}>
-    
+export default ExploreScreen;
 
-    <Text style={styles.name}>{name}</Text>
-    <Text style={styles.weight}>{weight}</Text>
-    <Text style={styles.price}>{price}</Text>
-  </View>
-);
-
-const styles = StyleSheet.create({
-  container: { padding: 20 },
-  location: { fontSize: 16, color: '#666', marginBottom: 10 },
-  sectionTitle: { fontSize: 20, fontWeight: 'bold', marginVertical: 10 },
-  offer: { fontSize: 16, color: 'green', marginBottom: 20 },
-  productRow: { flexDirection: 'row', justifyContent: 'space-between' },
-  card: {
-    width: '48%',
-    backgroundColor: '#f9f9f9',
-    padding: 10,
-    borderRadius: 8,
-    marginBottom: 20,
-  },
-  image: { height: 100, width: '100%', backgroundColor: '#ddd' },
-  name: { fontSize: 16, fontWeight: '600', marginTop: 10 },
-  weight: { fontSize: 14, color: '#888' },
-  price: { fontSize: 16, color: 'green', marginTop: 5 },
-});
-
-export default HomeScreen;

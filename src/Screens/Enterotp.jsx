@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import {
   View,
-  Text, 
+  Text,
   TextInput,
   TouchableOpacity,
   StyleSheet,
@@ -13,7 +13,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const OTPVerificationScreen = ({ navigation, route }) => {
   const mobile = route.params?.phone;
-  
+
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const inputs = useRef([]);
 
@@ -56,8 +56,8 @@ const OTPVerificationScreen = ({ navigation, route }) => {
     setVerifying(true);
     try {
       console.log(mobile, code);
-      const response = await axios.post('http://192.168.0.104:8080/auth/otp/verify', {
-         "mobileNumber": mobile,
+      const response = await axios.post('http://192.168.0.106:8080/auth/otp/verify', {
+        "mobileNumber": mobile,
         "otp": code
       });
 
@@ -84,7 +84,7 @@ const OTPVerificationScreen = ({ navigation, route }) => {
     setTimer(30);
     setCanResend(false);
 
-    axios.post('http://192.168.0.104:8080/auth/otp/resend', {
+    axios.post('http://192.168.0.106:8080/auth/otp/resend', {
       identifier: mobile,
     }).then(res => {
       console.log('Resend response:', res.data);
