@@ -1,7 +1,7 @@
 import { View, Text, StatusBar, ScrollView, Image, TextInput, TouchableOpacity } from 'react-native';
 import React, { useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { myColors } from '../Utils/Mycolors';
+import { myColors } from '../Utilities/Mycolors';
 import { StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';

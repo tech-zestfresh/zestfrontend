@@ -1,8 +1,8 @@
 import { View, Text, TurboModuleRegistry, StatusBar, Image } from 'react-native'
 import React, { useEffect } from 'react'
-import {myColors} from "./../Utils/Mycolors";
+import {myColors} from "../Utilities/Mycolors";
 import { useNavigation } from '@react-navigation/native';
-import { loadSession } from '../Utils/Gettokenapi';
+import { loadSession } from '../Utilities/Gettokenapi';
 
 const Splash = () => {
 
